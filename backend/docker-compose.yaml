@@ -1,0 +1,24 @@
+services:
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto
+    volumes:
+    - "/srv/mosquitto/config:/mosquitto/config"
+    - "/srv/mosquitto/log:/mosquitto/log"
+    - "/srv/mosquitto/data/:/mosquitto/data"
+    restart: always
+    ports:
+    - "1883:1883" 
+
+
+  server:
+    container_name: server
+    build: ./server
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mosquitto
+    environment:
+      MQTT_BROKER: mosquitto
+      MQTT_PORT: 1883
