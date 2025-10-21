@@ -29,10 +29,10 @@ mqtt_client.loop_start()
 def get_humidity():
     if latest_humidity is None:
         return {"error": "No data yet"}
-    return {"humidity": latest_humidity}
+    return {"value": latest_humidity}
 
 @app.get("/api/temperature")
 def get_temperature():
     if latest_temperature is None:
         return {"error": "No data yet"}
-    return {"temperature": latest_temperature}
+    return {"value": latest_temperature}
