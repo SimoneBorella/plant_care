@@ -2,6 +2,25 @@
 Automated plant care system for plant watering and lighting
 
 ## Server side
+Setup mqtt stream directory:
+```
+./setup.bash
+```
+
+
+Build backend system:
+```
+docker compose build
+```
+
+Run and stop backend system:
+```
+docker compose up
+docker compose down
+```
+
+
+
 
 ### API
 

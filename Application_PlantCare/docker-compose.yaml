@@ -1,0 +1,42 @@
+services:
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto
+    volumes:
+    - "/srv/mosquitto/config:/mosquitto/config"
+    - "/srv/mosquitto/log:/mosquitto/log"
+    - "/srv/mosquitto/data/:/mosquitto/data"
+    restart: always
+    ports:
+    - "1883:1883" 
+
+  mongo:
+    container_name: plantcare-mongo
+    image: mongo:7
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  nextjs:
+    container_name: plantcare-webapp
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongo:27017/plantcare
+      - MQTT_BROKER_URL=mqtt://mosquitto:1883
+    volumes:
+      - ./app:/app
+      - /app/node_modules
+    depends_on:
+      - mongo
+      - mosquitto
+    command: npm run dev
+    restart: always
+
+
+volumes:
+  mongo-data:
