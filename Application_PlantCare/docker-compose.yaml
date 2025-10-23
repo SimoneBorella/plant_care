@@ -10,14 +10,17 @@ services:
     ports:
     - "1883:1883" 
 
-  mongo:
-    container_name: plantcare-mongo
-    image: mongo:4.4
+  couchdb:
+    container_name: plantcare-couchdb
+    image: couchdb:3.4.2
     restart: always
+    environment:
+      COUCHDB_USER: admin
+      COUCHDB_PASSWORD: password
     ports:
-      - "27017:27017"
+      - "5984:5984"
     volumes:
-      - mongo-data:/data/db
+      - couchdb-data:/opt/couchdb/data
 
   nextjs:
     container_name: plantcare-webapp
@@ -26,17 +29,17 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-      - MONGODB_URI=mongodb://mongo:27017/plantcare
+      - COUCHDB_URL=http://admin:password@couchdb:5984
       - MQTT_BROKER_URL=mqtt://mosquitto:1883
     volumes:
       - ./app:/app
       - /app/node_modules
     depends_on:
-      - mongo
+      - couchdb
       - mosquitto
     command: npm run dev
     restart: always
 
 
 volumes:
-  mongo-data:
+  couchdb-data:
