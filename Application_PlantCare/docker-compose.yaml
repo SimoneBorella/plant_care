@@ -12,15 +12,16 @@ services:
 
   couchdb:
     container_name: plantcare-couchdb
-    image: couchdb:3.4.2
+    image: couchdb:3.4.4
     restart: always
-    environment:
-      COUCHDB_USER: admin
-      COUCHDB_PASSWORD: password
     ports:
       - "5984:5984"
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=secret
     volumes:
-      - couchdb-data:/opt/couchdb/data
+      - /srv/couchdb/data:/opt/couchdb/data
+    user: "1000:1000"
 
   nextjs:
     container_name: plantcare-webapp
@@ -39,7 +40,3 @@ services:
       - mosquitto
     command: npm run dev
     restart: always
-
-
-volumes:
-  couchdb-data:
