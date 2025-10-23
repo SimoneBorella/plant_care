@@ -12,7 +12,7 @@ services:
 
   mongo:
     container_name: plantcare-mongo
-    image: mongo:7
+    image: mongo:4.4
     restart: always
     ports:
       - "27017:27017"
