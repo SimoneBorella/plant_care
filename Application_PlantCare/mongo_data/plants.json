@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Sudowoodo",
+    "type": "Ficus Ginseng",
+    "description": "Nice and happy plant",
+    "createdAt": "2025-10-23T20:00:00Z",
+    "updatedAt": "2025-10-23T20:00:00Z"
+  },
+  {
+    "name": "Gloria",
+    "type": "Cactus Mammillaria",
+    "description": "Spiky but lovable",
+    "createdAt": "2025-10-23T20:00:00Z",
+    "updatedAt": "2025-10-23T20:00:00Z"
+  }
+]

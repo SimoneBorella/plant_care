@@ -10,7 +10,7 @@
 
 const char* WIFI_SSID = "iliadbox-69DF6E";
 const char* WIFI_PASSWORD = "hkvxnqsh5xqd9zsrqwsv2v";
-const char* MQTT_BROKER = "192.168.1.123";
+const char* MQTT_BROKER = "192.168.1.51";
 const int   MQTT_PORT = 1883;
 const char* MQTT_SOIL_MOISTURE_TOPIC = "plantcare/sudowoodo/soilmoisture";
 const int MQTT_PUBLISH_INTERVAL = 5000;

@@ -6,7 +6,8 @@ import {
   IconShare3,
   IconTrash,
   IconPlus,
-  type Icon,
+  IconPlant2,
+  type Icon
 } from "@tabler/icons-react"
 
 import {
@@ -22,36 +23,43 @@ import {
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuAction,
-  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
 
+import { usePlants } from "@/components/providers/plants-provider"
 
-export function NavPlants({
-  items,
-}: {
-  items: {
-    name: string
-    url: string
-    icon: Icon
-  }[]
-}) {
+export function NavPlants() {
   const { isMobile } = useSidebar()
+  const { plants, addPlant, removePlant } = usePlants()
+
+  const handleAddPlant = async () => {
+    const now = new Date().toISOString()
+    const newPlant = {
+      name: `Plant ${plants.length + 1}`,
+      type: "Unknown",
+      description: "Newly added plant",
+      createdAt: now,
+      updatedAt: now,
+    }
+    await addPlant(newPlant)
+  }
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Plants</SidebarGroupLabel>
+
       <SidebarMenu>
-        {items.map((item) => (
-          <SidebarMenuItem key={item.name}>
+        {plants.map((plant) => (
+          <SidebarMenuItem key={plant.name}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
-                <item.icon />
-                <span>{item.name}</span>
+              <a href={`/plants/${encodeURIComponent(plant.name)}`}>
+                <IconPlant2 />
+                <span>{plant.name}</span>
               </a>
             </SidebarMenuButton>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuAction
@@ -62,21 +70,23 @@ export function NavPlants({
                   <span className="sr-only">More</span>
                 </SidebarMenuAction>
               </DropdownMenuTrigger>
+
               <DropdownMenuContent
                 className="w-24 rounded-lg"
                 side={isMobile ? "bottom" : "right"}
                 align={isMobile ? "end" : "start"}
               >
-                <DropdownMenuItem>
-                  <IconFolder />
-                  <span>Open</span>
+                <DropdownMenuItem asChild>
+                  <a href={`/plants/${encodeURIComponent(plant.name)}`}>
+                    <IconFolder />
+                    <span>Open</span>
+                  </a>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <IconShare3 />
-                  <span>Share</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive">
+
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => removePlant(plant.name)}
+                >
                   <IconTrash />
                   <span>Delete</span>
                 </DropdownMenuItem>
@@ -84,30 +94,23 @@ export function NavPlants({
             </DropdownMenu>
           </SidebarMenuItem>
         ))}
-        {/* <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
-            <IconDots className="text-sidebar-foreground/70" />
-            <span>More</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem> */}
       </SidebarMenu>
 
 
-    
+
+
 
 
       <SidebarMenu>
         <SidebarMenuButton
           tooltip="Add new plant"
+          onClick={handleAddPlant}
           className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
         >
           <IconPlus />
           <span>Add new plant</span>
         </SidebarMenuButton>
       </SidebarMenu>
-
-
-      
     </SidebarGroup>
   )
 }
