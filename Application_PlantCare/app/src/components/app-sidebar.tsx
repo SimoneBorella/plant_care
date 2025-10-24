@@ -50,8 +50,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="/">
-                <IconPlant className="!size-5" />
-                <span className="text-base font-semibold">PlantCare</span>
+                <IconPlant className="!size-7" />
+                <span className="text-2xl font-bold">PlantCare</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

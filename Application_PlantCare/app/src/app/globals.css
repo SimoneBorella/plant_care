@@ -134,6 +134,8 @@ body {
 .theme-scaled {
   @media (min-width: 1024px) {
     --radius: 0.6rem;
+    --text-2xl: 1.75rem;
+    --text-xl: 1.45rem;
     --text-lg: 1.05rem;
     --text-base: 0.85rem;
     --text-sm: 0.8rem;

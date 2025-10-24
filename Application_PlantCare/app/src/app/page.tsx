@@ -11,13 +11,18 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 
+import {
+  IconPlant,
+  IconPlant2
+} from "@tabler/icons-react"
+
 import Autoplay from "embla-carousel-autoplay"
 import { Button } from "@/components/ui/button"
 
 export default function Home() {
 
   const autoplay_plugin = React.useRef(
-    Autoplay({ delay: 1000 })
+    Autoplay({ delay: 4000 })
   )
 
   const router = useRouter()
@@ -29,15 +34,18 @@ export default function Home() {
   return (
     <div className="flex flex-col flex-1 items-center justify-center py-10">
 
-      <h1 className="text-5xl font-bold text-center h-40 flex items-center justify-center">
-        Welcome to PlantCare 🌿
+      <h1 className="text-4xl font-bold text-center flex items-center justify-center">
+        Welcome to
+      </h1>
+      <h1 className="text-7xl font-bold text-center h-30 flex items-center justify-center">
+        <IconPlant className="!size-20" />
+        <span >PlantCare</span>
       </h1>
 
       <Button
           onClick={handleGoDashboard}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear mt-8"
         >
-          {/* <IconPlus /> */}
           <span>Go to dashboard</span>
       </Button>
 
@@ -45,7 +53,7 @@ export default function Home() {
         plugins={[autoplay_plugin.current]}
         onMouseEnter={autoplay_plugin.current.stop}
         onMouseLeave={autoplay_plugin.current.reset}
-        className="w-full max-w-md mt-20">
+        className="w-full max-w-md mt-16">
         <CarouselContent>
           {Array.from({ length: 5 }).map((_, index) => (
             <CarouselItem key={index}>
