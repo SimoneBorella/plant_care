@@ -6,12 +6,33 @@
 // ----------------------------
 // Configuration
 // ----------------------------
+
 #define LED_PIN 48
 #define LED_COUNT 1
+
+
+
+const int NUM_SLOTS = 1;
+const int PLANT_SLOTS[NUM_SLOTS] = {0};
+
+const int SOIL_PINS[NUM_SLOTS] = {14};
+// const int TEMP_PINS[NUM_SLOTS] = {0};
+
+
+String soil_topics[NUM_SLOTS];
+// String temp_topics[NUM_SLOTS];
+
+
+
+
+
 #define SOIL_MOISTURE_SENSOR_PIN 14
 
-const char* WIFI_SSID = "WifiCasa";
-const char* WIFI_PASSWORD = "h8ffAyDNHDDkYAqN";
+// const char* WIFI_SSID = "WifiCasa";
+// const char* WIFI_PASSWORD = "h8ffAyDNHDDkYAqN";
+
+const char* WIFI_SSID = "iliadbox-69DF6E";
+const char* WIFI_PASSWORD = "hkvxnqsh5xqd9zsrqwsv2v";
 
 // Fallback IP (usato se non riceviamo discovery)
 const char* MQTT_SERVER_FALLBACK = "192.168.1.9";
@@ -20,8 +41,9 @@ const int   MQTT_PORT_FALLBACK = 1883;
 const int UDP_LISTEN_PORT = 1884;   // Porta dove ascoltare i messaggi broadcast
 const int UDP_TIMEOUT_MS = 5000;    // Timeout in ms per discovery
 
-const char* MQTT_SOIL_MOISTURE_TOPIC = "plantcare/sudowoodo/soilmoisture";
-const int MQTT_PUBLISH_INTERVAL = 5000;
+const int MQTT_INFO_PUBLISH_INTERVAL = 10000;
+const int MQTT_HEARTBEAT_PUBLISH_INTERVAL = 5000;
+const int MQTT_SENSOR_PUBLISH_INTERVAL = 2000;
 
 const int SOIL_MOISTURE_WET = 1040;
 const int SOIL_MOISTURE_DRY = 2585;
@@ -39,7 +61,17 @@ int mqttServerPort = MQTT_PORT_FALLBACK;
 bool mqttDiscovered = false;
 
 uint16_t hue = 0;
-unsigned long lastMsg = 0;
+
+unsigned long lastInfoMsg = 0;
+unsigned long lastHeartbeatMsg = 0;
+unsigned long lastSensorMsg = 0;
+
+// ----------------------------
+// Dynamic Client ID
+// ----------------------------
+String clientId;
+
+
 
 // ----------------------------
 // Functions
@@ -112,9 +144,6 @@ void reconnect_mqtt_server() {
     Serial.print(":");
     Serial.println(mqttServerPort);
 
-    String clientId = "ESP32S3-";
-    clientId += String(random(0xffff), HEX);
-
     if (client.connect(clientId.c_str())) {
       Serial.println("MQTT broker connected!");
     } else {
@@ -125,6 +154,21 @@ void reconnect_mqtt_server() {
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+// ----------------------------
+// Subscription Callback
+// ----------------------------
 
 void callback(char* topic, byte* message, unsigned int length) {
   String payload;
@@ -138,6 +182,73 @@ void callback(char* topic, byte* message, unsigned int length) {
   Serial.println(payload);
 }
 
+
+
+
+
+
+
+
+
+
+// ----------------------------
+// Publishing Functions
+// ----------------------------
+
+void publishSensorData() {
+  for(int i = 0; i < NUM_SLOTS; i++) {
+    int soilAnalogValue = analogRead(SOIL_PINS[i]);
+    int soilValue = map(soilAnalogValue, SOIL_MOISTURE_WET, SOIL_MOISTURE_DRY, 0, 100);
+    soilValue = 100 - soilValue;
+    String soilMessage = String(soilValue);
+
+    client.publish(soil_topics[i].c_str(), soilMessage.c_str());
+    Serial.print("Published [");
+    Serial.print(soil_topics[i]);
+    Serial.print("] : ");
+    Serial.println(soilMessage);
+  }
+}
+
+void publishInfo() {
+  String payload = "{ \"device_id\": \"" + clientId + "\", \"available_slots\": [";
+  for(int i = 0; i < NUM_SLOTS; i++) {
+    payload += String(PLANT_SLOTS[i]);
+    if(i < NUM_SLOTS-1) payload += ",";
+  }
+  payload += "] }";
+
+  String topic = "/devices/" + clientId + "/info";
+  client.publish(topic.c_str(), payload.c_str());
+  Serial.print("Published [");
+  Serial.print(topic);
+  Serial.print("] : ");
+  Serial.println(payload);
+}
+
+void publishHeartbeat() {
+  String topic = "/devices/" + clientId + "/heartbeat";
+  String payload = "{ \"device_id\": \"" + clientId + "\" }";
+  client.publish(topic.c_str(), payload.c_str());
+  Serial.print("Published [");
+  Serial.print(topic);
+  Serial.print("] : ");
+  Serial.println(payload);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // ----------------------------
 // Setup
 // ----------------------------
@@ -150,6 +261,18 @@ void setup() {
   LED_RGB.show();
 
   setup_wifi();
+
+  uint64_t chipid = ESP.getEfuseMac();
+  clientId = "esp_" + String((uint16_t)(chipid >> 32), HEX) + String((uint32_t)chipid, HEX);
+
+  Serial.print("Client id: ");
+  Serial.println(clientId);
+
+  for (int i = 0; i < NUM_SLOTS; i++) {
+    int slot = PLANT_SLOTS[i];
+    soil_topics[i] = "/plant_care/" + clientId + "/" + String(slot) + "/soil_moisture";
+    // temp_topics[i] = "/plant_care/" + clientId + "/" + String(slot) + "/temperature";
+  }
 
   if (!discoverMQTTviaUDP()) {
     mqttServerIP.fromString(MQTT_SERVER_FALLBACK);
@@ -178,20 +301,25 @@ void loop() {
   hue += 8;
   if (hue >= 65536) hue = 0;
 
-  // Publish soil moisture
+
   unsigned long now = millis();
-  if (now - lastMsg > MQTT_PUBLISH_INTERVAL) {
-    lastMsg = now;
-    // int analogValue = analogRead(SOIL_MOISTURE_SENSOR_PIN);
-    // int soilMoistureValue = map(analogValue, SOIL_MOISTURE_WET, SOIL_MOISTURE_DRY, 0, 100);
-    // soilMoistureValue = 100 - soilMoistureValue;
-    // String message = String(soilMoistureValue);
 
-    int randomValue = random(0, 101);
-    String message = String(randomValue);
-
-    client.publish(MQTT_SOIL_MOISTURE_TOPIC, message.c_str());
-    Serial.print("Published: ");
-    Serial.println(message);
+  // Sensor data publishing
+  if(now - lastSensorMsg >= MQTT_SENSOR_PUBLISH_INTERVAL){
+    lastSensorMsg = now;
+    publishSensorData();
   }
+
+  // Info publishing
+  if(now - lastInfoMsg >= MQTT_INFO_PUBLISH_INTERVAL){
+    lastInfoMsg = now;
+    publishInfo();
+  }
+
+  // Heartbeat publishing
+  if(now - lastHeartbeatMsg >= MQTT_HEARTBEAT_PUBLISH_INTERVAL){
+    lastHeartbeatMsg = now;
+    publishHeartbeat();
+  }
+
 }

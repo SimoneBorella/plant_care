@@ -2,31 +2,12 @@
 
 import * as React from "react"
 import {
-  IconCamera,
-  IconChartBar,
-  IconDashboard,
-  IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
-  IconFolder,
-  IconHelp,
-  IconInnerShadowTop,
-  IconListDetails,
-  IconReport,
-  IconSearch,
-  IconSettings,
-  IconUsers,
-  IconPlus,
   IconPlant,
-  IconPlant2,
-  IconPlantOff,
-  IconPlant2Off,
-
 } from "@tabler/icons-react"
 
-import { NavPlants } from "@/components/nav-plants"
 import { NavMain } from "@/components/nav-main"
+import { NavPlants } from "@/components/nav-plants"
+import { NavDevices } from "@/components/nav-devices"
 import { NavSecondary } from "@/components/nav-secondary"
 import {
   Sidebar,
@@ -59,6 +40,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain />
+        <NavDevices />
         <NavPlants />
         <NavSecondary className="mt-auto" />
       </SidebarContent>

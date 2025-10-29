@@ -8,15 +8,20 @@ services:
     - "/srv/mosquitto/data/:/mosquitto/data"
     restart: always
     ports:
-    - "1883:1883" 
-  
-  mqtt_discovery_broadcast:
-    container_name: mqtt-discovery
-    build: ./mqtt_discovery_broadcast
+    - "1883:1883"
+
+  backend:
+    container_name: backend
+    build: ./backend
     restart: always
     network_mode: "host"
     depends_on:
+      - mongo
       - mosquitto
+    environment:
+      - MONGODB_URI=mongodb://plantcare-mongo:27017/plantcare
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
 
   mongo:
     container_name: plantcare-mongo
