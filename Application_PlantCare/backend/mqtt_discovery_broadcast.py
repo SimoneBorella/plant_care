@@ -13,7 +13,6 @@ def get_local_ip():
     """
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        # Connessione fittizia per determinare l'interfaccia
         s.connect(("8.8.8.8", 80))
         ip = s.getsockname()[0]
     except Exception:
@@ -30,7 +29,7 @@ def main():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-    print(f"📡 MQTT Discovery Broadcaster started")
+    print(f"MQTT Discovery Broadcaster started")
     print(f"Announcing broker at {broker_ip}:{BROKER_PORT}")
     print(f"Broadcasting every 5 seconds on UDP port {PORT}...")
 
