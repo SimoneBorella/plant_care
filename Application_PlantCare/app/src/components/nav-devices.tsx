@@ -43,7 +43,9 @@ export function NavDevices() {
     try {
       const msg = JSON.parse(event.data)
 
-      const newDevices = Array.isArray(msg) ? msg : [msg]
+      if (msg.type !== "devices") return
+
+      const newDevices = Array.isArray(msg.data) ? msg.data : [msg.data]
 
       setDevices((prev) => {
         const updated = [...prev] // copy previous state

@@ -31,8 +31,13 @@ asyncio.set_event_loop(loop)
 async def broadcast_devices():
     """Send all devices to all connected WebSocket clients."""
     devices = list(devices_col.find({}, {"_id": 0}))
-    # payload = json.dumps(devices)
-    payload = json_util.dumps(devices)
+    
+    message = {
+        "type": "devices",
+        "data": devices
+    }
+
+    payload = json_util.dumps(message)
 
     to_remove = set()
     for ws in connected_clients:
